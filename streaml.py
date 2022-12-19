@@ -2,19 +2,24 @@ import streamlit as st
 from docx import Document
 from bs4 import BeautifulSoup
 import requests
+import json 
 from parser_gost import parser
-
-#ocument = Document('TestKURS.docx')
-#document.save('TestKURS.docx')
+import os
 
 
-uploaded_file = st.file_uploader("Upload a file")
+def file_selector(folder_path='.'):
+    filenames = os.listdir(folder_path)
+    selected_filename = st.selectbox('Select a file', filenames)
+    return os.path.join(folder_path, selected_filename)
 
-if uploaded_file:
-   st.write("Filename: ", uploaded_file.name)
+filename = file_selector()
+st.write('You selected `%s`' % filename)
 
-result = parser(uploaded_file)
-st.write("Результат: ")
-st.write(result)
+
+inputs = {"doc": filename}
+
+if st.button('Parse'):
+   res = requests.post(url = "http://127.0.0.1:8000/parser", data = json.dumps(inputs))
+   st.subheader(res.text)
 
 

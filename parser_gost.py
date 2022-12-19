@@ -3,11 +3,11 @@ from docx import Document
 from bs4 import BeautifulSoup
 import requests
 
-#ocument = Document('TestKURS.docx')
+#document = Document('TestKURS.docx')
 #document.save('TestKURS.docx')
-def parser(uploaded_file):
+def parser(doc):
 
-    document = Document(uploaded_file)
+    document = Document(doc)
 
     def OnlyRus():
         return re.compile("aDocIntro+\d[0-9]")
@@ -15,26 +15,19 @@ def parser(uploaded_file):
     gosts = []
     art = []
     dict_gost = {}
-    res = ""
+    res = []
     #for count in range(1,2437):
     #тест для первых 200
-    for count in range(200): 
+    for count in range(1, 200): 
         url = f'https://www.gostinfo.ru/catalog/gostlist?page={count}'
         page = requests.get(url)
         soup = BeautifulSoup(page.text, "html.parser")
         gosts = gosts + (soup.findAll('span', class_='textBlue'))
         art = art + (soup.find_all('a', id = OnlyRus()))
-        
-        #art = soup.findAll('a')
-        #gosts.text()
-        #for gost in gosts:
-        #print(gost.get_text())
 
     #делаю словарь 
     for i in range(len(gosts)):
         dict_gost[gosts[i].get_text()] = art[i].get_text()
-    #print(dict_gost)
-
 
     def in_dictionary(dict):  
         k = []
@@ -49,7 +42,7 @@ def parser(uploaded_file):
     for para in document.paragraphs:
         for i in range(len(dict_gost)):
             if k[i] in para.text and v[i] in para.text:
-                res += k[i]+v[i]
+                res.append(k[i]+" "+v[i])
 
     return res
     #Все Госты, которые встр на первых 200 стр сайта и в документе. 
