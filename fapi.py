@@ -1,13 +1,16 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
+from pydantic import BaseModel
+from parser_gost import parser
+
+class Input(BaseModel):
+    document : str 
 
 app = FastAPI()
 
+@app.post("/parser")
 
-@app.post("/files/")
-async def create_file(file: bytes = File()):
-    return {"file_size": len(file)}
+def operate(iinput:Input):
+    result = parser(iinput.document)
+    return result
 
 
-@app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile):
-    return {"filename": file.filename}
